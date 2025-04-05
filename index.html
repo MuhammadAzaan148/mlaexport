@@ -2,112 +2,155 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>ZPL Label Generator</title>
+  <title>Label Generator</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f0f0f0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f7fa;
       margin: 0;
       padding: 0;
     }
-    #loginScreen {
+
+    #loginScreen, #mainApp {
+      display: none;
+      padding: 20px;
+    }
+
+    .card {
+      max-width: 600px;
+      background: #fff;
+      margin: 40px auto;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 10px 20px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    textarea {
+      width: 100%;
+      height: 300px;
+      margin-top: 20px;
+      padding: 10px;
+      font-family: monospace;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .gif-container {
+      text-align: center;
+      margin-top: 40px;
+    }
+
+    .gif-container img {
+      width: 150px;
+    }
+
+    .center {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
-      text-align: center;
-    }
-    #loginScreen img {
-      width: 150px;
-      margin-bottom: 10px;
-    }
-    input, button {
-      padding: 10px;
-      font-size: 16px;
-      margin: 6px 0;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      width: 250px;
-    }
-    button {
-      cursor: pointer;
-      background-color: #007bff;
-      color: white;
-    }
-    #mainApp {
-      display: none;
-      max-width: 500px;
-      margin: 40px auto;
       padding: 20px;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-    label {
-      font-weight: bold;
-      margin-top: 10px;
-      display: block;
-    }
-    textarea {
-      width: 100%;
-      height: 400px;
-      margin-top: 12px;
-      padding: 10px;
+
+    #previewBox {
+      margin-top: 20px;
+      background: #eef;
+      padding: 15px;
+      border-radius: 10px;
       font-family: monospace;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-    #copyBtn {
-      background-color: #4caf50;
+      white-space: pre-wrap;
     }
   </style>
 </head>
 <body>
 
-<div id="loginScreen">
-  <img src="https://media.giphy.com/media/l3q2K5jinAlChoCLS/giphy.gif" alt="Waving Boy">
-  <h2>Hey Azaan, is it you? Please confirm 😊</h2>
+<!-- Login Screen -->
+<div id="loginScreen" class="center">
+  <div class="gif-container">
+    <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMGd2ZWx2Nmx6eDJjYWl6aXdzb3pxcDByZG05Z2tsNGsyZm5nMmIxeCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/hsI5vX5cVqKek/giphy.gif" alt="Welcome">
+    <h2>Hey Azaan, is it you? Please confirm 👋</h2>
+  </div>
   <input type="password" id="accessCode" placeholder="Enter access code">
   <button onclick="checkAccess()">Unlock</button>
   <p id="error" style="color:red;"></p>
 </div>
 
+<!-- Main App -->
 <div id="mainApp">
-  <h2>ZPL Label Generator</h2>
+  <div class="card">
+    <h2>Label Generator</h2>
 
-  <label>AWB No.</label>
-  <input type="text" id="awb" value="071-55976922" oninput="syncBarcode()">
+    <label>AWB No.</label>
+    <input type="text" id="awb" value="071-55976922" oninput="autoFillBarcode()">
 
-  <label>Destination</label>
-  <input type="text" id="destination" value="TIP">
+    <label>Barcode (auto from AWB)</label>
+    <input type="text" id="barcode" readonly>
 
-  <label>Origin</label>
-  <input type="text" id="origin" value="DXB">
+    <label>Destination</label>
+    <input type="text" id="destination" value="TIP">
 
-  <label>Weight</label>
-  <input type="text" id="weight" value="2120.0">
+    <label>Origin</label>
+    <input type="text" id="origin" value="DXB">
 
-  <label>No. of Pieces</label>
-  <input type="number" id="total" value="213">
+    <label>Weight</label>
+    <input type="text" id="weight" value="2120.0">
 
-  <label>Start From Piece</label>
-  <input type="number" id="start" value="1">
+    <label>No. of Pieces</label>
+    <input type="number" id="total" value="213">
 
-  <label>Generate How Many</label>
-  <input type="number" id="count" value="10">
+    <label>Start From Piece</label>
+    <input type="number" id="start" value="1">
 
-  <button onclick="generateZPL()">Generate ZPL</button>
-  <button id="copyBtn" onclick="copyZPL()">Copy ZPL</button>
+    <label>Generate How Many</label>
+    <input type="number" id="count" value="10">
 
-  <textarea id="output" readonly></textarea>
+    <button onclick="generateZPL()">Generate ZPL</button>
+    <button onclick="downloadZPL()">Download .txt</button>
+    <button onclick="previewLabel()">Preview First Label</button>
 
-  <!-- Hidden barcode field used internally -->
-  <input type="hidden" id="barcode">
+    <textarea id="output" readonly></textarea>
+
+    <div id="previewBox" style="display: none;"></div>
+  </div>
 </div>
 
 <script>
-  const secret = "azaan148"; // Change this to your secret code
+  const secret = "azaan148";
 
   function checkAccess() {
     const code = document.getElementById("accessCode").value;
@@ -119,15 +162,15 @@
     }
   }
 
-  function syncBarcode() {
+  function autoFillBarcode() {
     const awb = document.getElementById('awb').value;
-    const cleaned = awb.replace(/-/g, '');
-    document.getElementById('barcode').value = cleaned;
+    const digitsOnly = awb.replace(/-/g, '');
+    document.getElementById('barcode').value = digitsOnly + '0001';
   }
 
   function generateZPL() {
     const awb = document.getElementById('awb').value;
-    const barcodeBase = document.getElementById('barcode').value;
+    const barcode = document.getElementById('barcode').value.replace(/-/g, '');
     const destination = document.getElementById('destination').value;
     const origin = document.getElementById('origin').value;
     const weight = document.getElementById('weight').value;
@@ -135,10 +178,11 @@
     const start = parseInt(document.getElementById('start').value);
     const count = parseInt(document.getElementById('count').value);
 
+    const baseBarcode = barcode.slice(0, -4);
     let result = '';
 
     for (let i = start; i < start + count; i++) {
-      const pieceBarcode = barcodeBase + String(i).padStart(4, '0');
+      const uniqueBarcode = baseBarcode + String(i).padStart(4, '0');
       result += `
 ^XA
 ^PW800
@@ -148,7 +192,7 @@
 ^CF0,50
 ^FO200,95^FDETHIOPIAN AIRLINES S.C.^FS
 ^BY3,2,80
-^FO100,180^BC^FD${pieceBarcode}^FS
+^FO100,180^BC^FD${uniqueBarcode}^FS
 ^CF0,50
 ^FO70,310^FDAWB No.^FS
 ^CF0,70
@@ -183,14 +227,24 @@
     document.getElementById('output').value = result.trim();
   }
 
-  function copyZPL() {
-    const output = document.getElementById('output');
-    output.select();
-    document.execCommand('copy');
-    alert('ZPL copied to clipboard!');
+  function downloadZPL() {
+    const blob = new Blob([document.getElementById('output').value], { type: "text/plain;charset=utf-8" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "labels.txt";
+    link.click();
   }
 
-  window.onload = syncBarcode;
+  function previewLabel() {
+    const lines = document.getElementById("output").value.split("^XZ");
+    const preview = lines[0] + "^XZ";
+    document.getElementById("previewBox").textContent = preview;
+    document.getElementById("previewBox").style.display = "block";
+  }
+
+  // Auto-fill barcode on load
+  window.onload = autoFillBarcode;
+  document.getElementById("loginScreen").style.display = "flex";
 </script>
 
 </body>
