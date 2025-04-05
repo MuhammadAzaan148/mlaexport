@@ -1,38 +1,47 @@
-<!--
-  🌟 Label Generator Web App
-  Created by: Muhammad Azaan
--->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Label Generator</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f9f9f9;
-      margin: 0;
-      padding: 0;
-    }
-
-    #loginScreen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
+      max-width: 500px;
+      margin: 40px auto;
       padding: 20px;
-      text-align: center;
+      background: #f5f5f5;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0,0,0,0.1);
     }
 
-    #accessCode {
+    h2 {
+      text-align: center;
+      animation: slideDown 0.7s ease-out;
+      font-size: 28px;
+    }
+
+    label {
+      font-weight: bold;
+      margin-top: 12px;
+      display: block;
+    }
+
+    input {
+      width: 100%;
       padding: 10px;
-      font-size: 16px;
-      width: 200px;
-      margin: 10px 0;
+      margin-top: 6px;
+      margin-bottom: 12px;
       border-radius: 6px;
       border: 1px solid #ccc;
+      font-size: 15px;
+      transition: all 0.3s ease-in-out;
+    }
+
+    input:focus {
+      border-color: #1e88e5;
+      box-shadow: 0 0 6px rgba(30, 136, 229, 0.3);
+      outline: none;
     }
 
     button {
@@ -43,34 +52,19 @@
       border-radius: 6px;
       cursor: pointer;
       font-size: 16px;
+      margin-right: 8px;
+      transition: transform 0.2s, background-color 0.2s;
     }
 
-    #labelApp {
-      max-width: 500px;
-      margin: 40px auto;
-      padding: 20px;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    button:hover {
+      transform: scale(1.05);
+      background-color: #1565c0;
     }
 
-    h2 {
-      text-align: center;
-    }
-
-    label {
-      font-weight: bold;
-      margin-top: 10px;
-      display: block;
-    }
-
-    input {
-      width: 100%;
-      padding: 8px;
-      margin-top: 4px;
-      margin-bottom: 12px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
+    .button-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
     }
 
     textarea {
@@ -80,81 +74,53 @@
       border-radius: 6px;
       padding: 10px;
       font-family: monospace;
+      font-size: 14px;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
     }
 
-    .footer-credit {
-      text-align: center;
-      font-size: 12px;
-      color: #aaa;
-      margin-top: 30px;
+    textarea.show {
+      opacity: 1;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-30px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
+  <h2>Label Generator</h2>
 
-  <!-- Login Screen -->
-  <div id="loginScreen">
-    <h2>Welcome!</h2>
-    <p>Hey Azaan, is it you? Please confirm 🔐</p>
-    <input type="password" id="accessCode" placeholder="Enter code">
-    <button onclick="checkAccess()">Unlock</button>
-    <p id="error" style="color: red;"></p>
+  <label>AWB No.</label>
+  <input type="text" id="awb" placeholder="e.g. 071-55976922">
+
+  <label>Destination</label>
+  <input type="text" id="destination" placeholder="e.g. TIP">
+
+  <label>Origin</label>
+  <input type="text" id="origin" placeholder="e.g. DXB">
+
+  <label>Weight</label>
+  <input type="text" id="weight" placeholder="e.g. 2120.0">
+
+  <label>No. of Pieces</label>
+  <input type="number" id="total" placeholder="e.g. 213">
+
+  <label>Start From Piece</label>
+  <input type="number" id="start" placeholder="e.g. 1">
+
+  <label>Generate How Many</label>
+  <input type="number" id="count" placeholder="e.g. 10">
+
+  <div class="button-group">
+    <button onclick="generateZPL()">Generate Label</button>
+    <button onclick="downloadZPL()">Download Label</button>
   </div>
 
-  <!-- Main App -->
-  <div id="labelApp" style="display:none;">
-    <h2>Label Generator</h2>
-
-    <label>AWB No.</label>
-    <input type="text" id="awb" value="071-55976922">
-
-    <label>Destination</label>
-    <input type="text" id="destination" value="TIP">
-
-    <label>Origin</label>
-    <input type="text" id="origin" value="DXB">
-
-    <label>Weight</label>
-    <input type="text" id="weight" value="2120.0">
-
-    <label>No. of Pieces</label>
-    <input type="number" id="total" value="213">
-
-    <label>Start From Piece</label>
-    <input type="number" id="start" value="1">
-
-    <label>Generate How Many</label>
-    <input type="number" id="count" value="10">
-
-    <button onclick="generateZPL()">Generate ZPL</button>
-
-    <textarea id="output" readonly></textarea>
-
-    <br>
-    <button onclick="downloadZPL()">Download .txt File</button>
-
-    <div class="footer-credit">Created by Muhammad Azaan</div>
-  </div>
+  <textarea id="output" readonly></textarea>
 
   <script>
-    const secret = "azaan148";
-
-    function checkAccess() {
-      const code = document.getElementById("accessCode").value;
-      if (code === secret) {
-        document.getElementById("loginScreen").style.display = "none";
-        document.getElementById("labelApp").style.display = "block";
-      } else {
-        document.getElementById("error").textContent = "Incorrect code!";
-      }
-    }
-
-    document.getElementById("accessCode").addEventListener("keydown", function(event) {
-      if (event.key === "Enter") {
-        checkAccess();
-      }
-    });
-
     function generateZPL() {
       const awb = document.getElementById('awb').value;
       const destination = document.getElementById('destination').value;
@@ -164,11 +130,17 @@
       const start = parseInt(document.getElementById('start').value);
       const count = parseInt(document.getElementById('count').value);
 
-      const baseBarcode = awb.replace(/-/g, '').slice(0, -4);
+      if (!awb || !destination || !origin || !weight || !total || !start || !count) {
+        alert("Please fill all fields.");
+        return;
+      }
+
+      const baseBarcode = awb.replace(/-/g, '').padEnd(11, '0'); // auto from awb, remove dash
       let result = '';
 
       for (let i = start; i < start + count; i++) {
-        const uniqueBarcode = baseBarcode + String(i).padStart(4, '0');
+        const barcode = baseBarcode + String(i).padStart(4, '0');
+
         result += `
 ^XA
 ^PW800
@@ -178,7 +150,7 @@
 ^CF0,50
 ^FO200,95^FDETHIOPIAN AIRLINES S.C.^FS
 ^BY3,2,80
-^FO100,180^BC^FD${uniqueBarcode}^FS
+^FO100,180^BC^FD${barcode}^FS
 ^CF0,50
 ^FO70,310^FDAWB No.^FS
 ^CF0,70
@@ -210,16 +182,22 @@
 `;
       }
 
-      document.getElementById('output').value = result.trim();
+      const output = document.getElementById('output');
+      output.value = result.trim();
+      output.classList.add('show');
     }
 
     function downloadZPL() {
-      const content = document.getElementById('output').value;
-      const blob = new Blob([content], { type: 'text/plain' });
+      const text = document.getElementById('output').value;
+      if (!text) {
+        alert("Generate the label first!");
+        return;
+      }
+      const blob = new Blob([text], { type: 'text/plain' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'labels.txt';
+      a.download = 'label.txt';
       a.click();
       URL.revokeObjectURL(url);
     }
