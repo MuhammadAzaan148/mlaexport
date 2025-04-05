@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ZPL Label Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 500px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #f9f9f9;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+    }
+    label {
+      font-weight: bold;
+      margin-top: 10px;
+      display: block;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      margin-bottom: 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #1e88e5;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    textarea {
+      width: 100%;
+      height: 400px;
+      margin-top: 20px;
+      border-radius: 6px;
+      padding: 10px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <h2>ZPL Label Generator</h2>
+  
+  <label>AWB No.</label>
+  <input type="text" id="awb" value="071-55976922">
+
+  <label>Barcode</label>
+  <input type="text" id="barcode" value="0715597692200001">
+
+  <label>Destination</label>
+  <input type="text" id="destination" value="TIP">
+
+  <label>Origin</label>
+  <input type="text" id="origin" value="DXB">
+
+  <label>Weight</label>
+  <input type="text" id="weight" value="2120.0">
+
+  <label>No. of Pieces</label>
+  <input type="number" id="total" value="213">
+
+  <label>Start From Piece</label>
+  <input type="number" id="start" value="1">
+
+  <label>Generate How Many</label>
+  <input type="number" id="count" value="10">
+
+  <button onclick="generateZPL()">Generate ZPL</button>
+
+  <textarea id="output" readonly></textarea>
+
+  <script>
+    function generateZPL() {
+      const awb = document.getElementById('awb').value;
+      const barcode = document.getElementById('barcode').value;
+      const destination = document.getElementById('destination').value;
+      const origin = document.getElementById('origin').value;
+      const weight = document.getElementById('weight').value;
+      const total = parseInt(document.getElementById('total').value);
+      const start = parseInt(document.getElementById('start').value);
+      const count = parseInt(document.getElementById('count').value);
+
+      let result = '';
+
+      for (let i = start; i < start + count; i++) {
+        result += `
+^XA
+^PW800
+^LL1270
+^CF0,100
+^FO50,70^FDET^FS
+^CF0,50
+^FO200,95^FDETHIOPIAN AIRLINES S.C.^FS
+^BY3,2,80
+^FO100,180^BC^FD${barcode}^FS
+^CF0,50
+^FO70,310^FDAWB No.^FS
+^CF0,70
+^FO160,360^FD${awb}^FS
+^CF0,50
+^FO50,490^FDDestination.^FS
+^FO400,490^FDNo of Pieces.^FS
+^CF0,60
+^FO50,540^FD${destination}^FS
+^FO400,540^FD${i} of ${total}^FS
+^CF0,50
+^FO50,630^FDWeight.^FS
+^FO400,630^FDOrigin.^FS
+^CF0,60
+^FO50,680^FD${weight}^FS
+^FO400,680^FD${origin}^FS
+^CF0,50
+^FO50,790^FDHAWB No.^FS
+^CF0,30
+^FO30,50^GB740,1190,4^FS
+^FO40,170^GB720,130,2^FS
+^FO40,300^GB720,120,2^FS
+^FO40,480^GB300,130,2^FS
+^FO390,480^GB310,130,2^FS
+^FO40,620^GB300,130,2^FS
+^FO390,620^GB310,130,2^FS
+^FO40,780^GB660,90,2^FS
+^XZ
+`;
+      }
+
+      document.getElementById('output').value = result.trim();
+    }
+  </script>
+</body>
+</html>
