@@ -5,121 +5,82 @@
   <title>Label Generator</title>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #f4f7fa;
+      font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
+      background: #121212;
+      color: #fff;
     }
-
-    #loginScreen, #mainApp {
-      display: none;
-      padding: 20px;
-    }
-
-    .card {
+    .container {
       max-width: 600px;
-      background: #fff;
       margin: 40px auto;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.05);
     }
-
     h2 {
       text-align: center;
-      margin-bottom: 20px;
+      color: #90caf9;
     }
-
     label {
-      display: block;
-      margin-top: 12px;
       font-weight: bold;
+      margin-top: 10px;
+      display: block;
     }
-
-    input {
+    input, textarea {
       width: 100%;
       padding: 10px;
       margin-top: 5px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      border: none;
+      font-size: 16px;
+      background-color: #2c2c2c;
+      color: #fff;
     }
-
     button {
       padding: 10px 20px;
-      background: #007bff;
+      background-color: #1e88e5;
       color: white;
       border: none;
-      border-radius: 8px;
-      font-size: 16px;
+      border-radius: 6px;
       cursor: pointer;
-      margin-top: 20px;
+      font-size: 16px;
+      margin-right: 10px;
     }
-
-    button:hover {
-      background: #0056b3;
-    }
-
-    textarea {
-      width: 100%;
-      height: 300px;
-      margin-top: 20px;
-      padding: 10px;
-      font-family: monospace;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-
-    .gif-container {
-      text-align: center;
-      margin-top: 40px;
-    }
-
-    .gif-container img {
-      width: 150px;
-    }
-
-    .center {
+    #loginScreen {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
-      padding: 20px;
+      text-align: center;
     }
-
-    #previewBox {
-      margin-top: 20px;
-      background: #eef;
-      padding: 15px;
-      border-radius: 10px;
-      font-family: monospace;
-      white-space: pre-wrap;
+    #mainApp {
+      display: none;
+    }
+    img {
+      max-width: 200px;
+      margin-bottom: 10px;
     }
   </style>
 </head>
 <body>
 
-<!-- Login Screen -->
-<div id="loginScreen" class="center">
-  <div class="gif-container">
-    <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExMGd2ZWx2Nmx6eDJjYWl6aXdzb3pxcDByZG05Z2tsNGsyZm5nMmIxeCZlcD12MV9naWZzX3NlYXJjaCZjdD1n/hsI5vX5cVqKek/giphy.gif" alt="Welcome">
-    <h2>Hey Azaan, is it you? Please confirm 👋</h2>
-  </div>
-  <input type="password" id="accessCode" placeholder="Enter access code">
-  <button onclick="checkAccess()">Unlock</button>
-  <p id="error" style="color:red;"></p>
+<div id="loginScreen">
+  <img src="https://media.tenor.com/KZtXihkN5FgAAAAM/cheer-go-go-go.gif" alt="Welcome">
+  <h2>Hey Azaan, is it you? Please confirm 😊</h2>
+  <input type="password" id="accessCode" placeholder="Enter Access Code">
+  <p id="error" style="color: red;"></p>
 </div>
 
-<!-- Main App -->
 <div id="mainApp">
-  <div class="card">
+  <div class="container">
     <h2>Label Generator</h2>
 
     <label>AWB No.</label>
-    <input type="text" id="awb" value="071-55976922" oninput="autoFillBarcode()">
-
-    <label>Barcode (auto from AWB)</label>
-    <input type="text" id="barcode" readonly>
+    <input type="text" id="awb" value="071-55976922" oninput="syncBarcode()">
 
     <label>Destination</label>
     <input type="text" id="destination" value="TIP">
@@ -141,16 +102,23 @@
 
     <button onclick="generateZPL()">Generate ZPL</button>
     <button onclick="downloadZPL()">Download .txt</button>
-    <button onclick="previewLabel()">Preview First Label</button>
 
     <textarea id="output" readonly></textarea>
-
-    <div id="previewBox" style="display: none;"></div>
   </div>
 </div>
 
 <script>
   const secret = "azaan148";
+
+  function syncBarcode() {
+    const awb = document.getElementById('awb').value.replace(/-/g, '');
+    document.getElementById('barcode')?.remove(); // remove old if exists
+    const input = document.createElement('input');
+    input.type = "hidden";
+    input.id = "barcode";
+    input.value = awb + "0001";
+    document.body.appendChild(input);
+  }
 
   function checkAccess() {
     const code = document.getElementById("accessCode").value;
@@ -162,15 +130,15 @@
     }
   }
 
-  function autoFillBarcode() {
-    const awb = document.getElementById('awb').value;
-    const digitsOnly = awb.replace(/-/g, '');
-    document.getElementById('barcode').value = digitsOnly + '0001';
-  }
+  document.getElementById("accessCode").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+      checkAccess();
+    }
+  });
 
   function generateZPL() {
     const awb = document.getElementById('awb').value;
-    const barcode = document.getElementById('barcode').value.replace(/-/g, '');
+    const baseBarcode = awb.replace(/-/g, '');
     const destination = document.getElementById('destination').value;
     const origin = document.getElementById('origin').value;
     const weight = document.getElementById('weight').value;
@@ -178,9 +146,7 @@
     const start = parseInt(document.getElementById('start').value);
     const count = parseInt(document.getElementById('count').value);
 
-    const baseBarcode = barcode.slice(0, -4);
     let result = '';
-
     for (let i = start; i < start + count; i++) {
       const uniqueBarcode = baseBarcode + String(i).padStart(4, '0');
       result += `
@@ -223,29 +189,17 @@
 ^XZ
 `;
     }
-
     document.getElementById('output').value = result.trim();
   }
 
   function downloadZPL() {
-    const blob = new Blob([document.getElementById('output').value], { type: "text/plain;charset=utf-8" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "labels.txt";
-    link.click();
+    const content = document.getElementById('output').value;
+    const blob = new Blob([content], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = "labels.txt";
+    a.click();
   }
-
-  function previewLabel() {
-    const lines = document.getElementById("output").value.split("^XZ");
-    const preview = lines[0] + "^XZ";
-    document.getElementById("previewBox").textContent = preview;
-    document.getElementById("previewBox").style.display = "block";
-  }
-
-  // Auto-fill barcode on load
-  window.onload = autoFillBarcode;
-  document.getElementById("loginScreen").style.display = "flex";
 </script>
-
 </body>
 </html>
