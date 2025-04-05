@@ -11,10 +11,45 @@
   <style>
     body {
       font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    #loginScreen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      padding: 20px;
+      text-align: center;
+    }
+
+    #accessCode {
+      padding: 10px;
+      font-size: 16px;
+      width: 200px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #1e88e5;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    #labelApp {
       max-width: 500px;
       margin: 40px auto;
       padding: 20px;
-      background: #f9f9f9;
+      background: #fff;
       border-radius: 12px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
@@ -38,16 +73,6 @@
       border: 1px solid #ccc;
     }
 
-    button {
-      padding: 10px 20px;
-      background-color: #1e88e5;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-
     textarea {
       width: 100%;
       height: 400px;
@@ -58,35 +83,18 @@
     }
 
     .footer-credit {
-      position: fixed;
-      bottom: 10px;
-      right: 10px;
+      text-align: center;
       font-size: 12px;
       color: #aaa;
-    }
-
-    #loginScreen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
-
-    #accessCode {
-      padding: 10px;
-      font-size: 16px;
-      width: 200px;
-      margin: 10px 0;
+      margin-top: 30px;
     }
   </style>
 </head>
-<body style="display:none;" id="mainApp">
+<body>
 
   <!-- Login Screen -->
   <div id="loginScreen">
     <h2>Welcome!</h2>
-    <img src="https://cdn.pixabay.com/photo/2016/04/01/11/09/welcome-1305353_960_720.png" alt="Welcome" style="width:140px; height:auto; margin: 10px;">
     <p>Hey Azaan, is it you? Please confirm 🔐</p>
     <input type="password" id="accessCode" placeholder="Enter code">
     <button onclick="checkAccess()">Unlock</button>
@@ -124,11 +132,8 @@
 
     <br>
     <button onclick="downloadZPL()">Download .txt File</button>
-  </div>
 
-  <!-- Signature / Footer -->
-  <div class="footer-credit">
-    Created by Muhammad Azaan
+    <div class="footer-credit">Created by Muhammad Azaan</div>
   </div>
 
   <script>
@@ -138,7 +143,6 @@
       const code = document.getElementById("accessCode").value;
       if (code === secret) {
         document.getElementById("loginScreen").style.display = "none";
-        document.getElementById("mainApp").style.display = "block";
         document.getElementById("labelApp").style.display = "block";
       } else {
         document.getElementById("error").textContent = "Incorrect code!";
