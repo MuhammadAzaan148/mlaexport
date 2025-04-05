@@ -1,3 +1,8 @@
+<!--
+  🌟 Label Generator Web App
+  Created by: Muhammad Azaan
+-->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,37 +11,33 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f4f4f4;
-      color: #333;
-    }
-    .container {
-      max-width: 600px;
+      max-width: 500px;
       margin: 40px auto;
-      background: #fff;
       padding: 20px;
+      background: #f9f9f9;
       border-radius: 12px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
+
     h2 {
       text-align: center;
-      color: #1e88e5;
     }
+
     label {
       font-weight: bold;
       margin-top: 10px;
       display: block;
     }
-    input, textarea {
+
+    input {
       width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      margin-bottom: 15px;
+      padding: 8px;
+      margin-top: 4px;
+      margin-bottom: 12px;
       border-radius: 6px;
       border: 1px solid #ccc;
-      font-size: 16px;
     }
+
     button {
       padding: 10px 20px;
       background-color: #1e88e5;
@@ -45,43 +46,59 @@
       border-radius: 6px;
       cursor: pointer;
       font-size: 16px;
-      margin-right: 10px;
     }
+
+    textarea {
+      width: 100%;
+      height: 400px;
+      margin-top: 20px;
+      border-radius: 6px;
+      padding: 10px;
+      font-family: monospace;
+    }
+
+    .footer-credit {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      font-size: 12px;
+      color: #aaa;
+    }
+
     #loginScreen {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       height: 100vh;
-      text-align: center;
     }
-    #mainApp {
-      display: none;
-    }
-    .sticker {
-      width: 180px;
-      margin-bottom: 10px;
-    }
-    .access-input {
-      width: 220px;
+
+    #accessCode {
+      padding: 10px;
+      font-size: 16px;
+      width: 200px;
+      margin: 10px 0;
     }
   </style>
 </head>
-<body>
+<body style="display:none;" id="mainApp">
 
-<div id="loginScreen">
-  <img src="https://stickerly.pstatic.net/sticker_pack/P3aSxIdN5tb4ed8Ih1PkKA/HJ6U7K/1/343f0a35-0e2a-4c2e-b0a3-b0bbf984048f.png" alt="Welcome Sticker" class="sticker">
-  <h2>Hey Azaan, is it you? Please confirm 😊</h2>
-  <input type="password" id="accessCode" class="access-input" placeholder="Enter Access Code">
-  <p id="error" style="color: red;"></p>
-</div>
+  <!-- Login Screen -->
+  <div id="loginScreen">
+    <h2>Welcome!</h2>
+    <img src="https://cdn.pixabay.com/photo/2016/04/01/11/09/welcome-1305353_960_720.png" alt="Welcome" style="width:140px; height:auto; margin: 10px;">
+    <p>Hey Azaan, is it you? Please confirm 🔐</p>
+    <input type="password" id="accessCode" placeholder="Enter code">
+    <button onclick="checkAccess()">Unlock</button>
+    <p id="error" style="color: red;"></p>
+  </div>
 
-<div id="mainApp">
-  <div class="container">
+  <!-- Main App -->
+  <div id="labelApp" style="display:none;">
     <h2>Label Generator</h2>
 
     <label>AWB No.</label>
-    <input type="text" id="awb" value="071-55976922" oninput="syncBarcode()">
+    <input type="text" id="awb" value="071-55976922">
 
     <label>Destination</label>
     <input type="text" id="destination" value="TIP">
@@ -102,55 +119,53 @@
     <input type="number" id="count" value="10">
 
     <button onclick="generateZPL()">Generate ZPL</button>
-    <button onclick="downloadZPL()">Download .txt</button>
 
     <textarea id="output" readonly></textarea>
+
+    <br>
+    <button onclick="downloadZPL()">Download .txt File</button>
   </div>
-</div>
 
-<script>
-  const secret = "azaan148";
+  <!-- Signature / Footer -->
+  <div class="footer-credit">
+    Created by Muhammad Azaan
+  </div>
 
-  function syncBarcode() {
-    const awb = document.getElementById('awb').value.replace(/-/g, '');
-    document.getElementById('barcode')?.remove(); // remove old if exists
-    const input = document.createElement('input');
-    input.type = "hidden";
-    input.id = "barcode";
-    input.value = awb + "0001";
-    document.body.appendChild(input);
-  }
+  <script>
+    const secret = "azaan148";
 
-  function checkAccess() {
-    const code = document.getElementById("accessCode").value;
-    if (code === secret) {
-      document.getElementById("loginScreen").style.display = "none";
-      document.getElementById("mainApp").style.display = "block";
-    } else {
-      document.getElementById("error").textContent = "Incorrect code!";
+    function checkAccess() {
+      const code = document.getElementById("accessCode").value;
+      if (code === secret) {
+        document.getElementById("loginScreen").style.display = "none";
+        document.getElementById("mainApp").style.display = "block";
+        document.getElementById("labelApp").style.display = "block";
+      } else {
+        document.getElementById("error").textContent = "Incorrect code!";
+      }
     }
-  }
 
-  document.getElementById("accessCode").addEventListener("keydown", function(event) {
-    if (event.key === "Enter") {
-      checkAccess();
-    }
-  });
+    document.getElementById("accessCode").addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        checkAccess();
+      }
+    });
 
-  function generateZPL() {
-    const awb = document.getElementById('awb').value;
-    const baseBarcode = awb.replace(/-/g, '');
-    const destination = document.getElementById('destination').value;
-    const origin = document.getElementById('origin').value;
-    const weight = document.getElementById('weight').value;
-    const total = parseInt(document.getElementById('total').value);
-    const start = parseInt(document.getElementById('start').value);
-    const count = parseInt(document.getElementById('count').value);
+    function generateZPL() {
+      const awb = document.getElementById('awb').value;
+      const destination = document.getElementById('destination').value;
+      const origin = document.getElementById('origin').value;
+      const weight = document.getElementById('weight').value;
+      const total = parseInt(document.getElementById('total').value);
+      const start = parseInt(document.getElementById('start').value);
+      const count = parseInt(document.getElementById('count').value);
 
-    let result = '';
-    for (let i = start; i < start + count; i++) {
-      const uniqueBarcode = baseBarcode + String(i).padStart(4, '0');
-      result += `
+      const baseBarcode = awb.replace(/-/g, '').slice(0, -4);
+      let result = '';
+
+      for (let i = start; i < start + count; i++) {
+        const uniqueBarcode = baseBarcode + String(i).padStart(4, '0');
+        result += `
 ^XA
 ^PW800
 ^LL1270
@@ -189,18 +204,21 @@
 ^FO40,780^GB660,90,2^FS
 ^XZ
 `;
-    }
-    document.getElementById('output').value = result.trim();
-  }
+      }
 
-  function downloadZPL() {
-    const content = document.getElementById('output').value;
-    const blob = new Blob([content], { type: 'text/plain' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = "labels.txt";
-    a.click();
-  }
-</script>
+      document.getElementById('output').value = result.trim();
+    }
+
+    function downloadZPL() {
+      const content = document.getElementById('output').value;
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'labels.txt';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
 </body>
 </html>
