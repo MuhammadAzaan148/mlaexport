@@ -68,6 +68,12 @@
       flex-wrap: wrap;
       justify-content: start;
     }
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 14px;
+      color: #888;
+    }
     @keyframes fadeIn {
       from {opacity: 0; transform: translateY(20px);}
       to {opacity: 1; transform: translateY(0);}
@@ -116,6 +122,10 @@
   </div>
 
   <textarea id="output" readonly></textarea>
+
+  <footer>
+    Made with ❤️ by Azaan
+  </footer>
 </div>
 
 <script>
@@ -137,7 +147,7 @@
 
   function generateZPL() {
     const awb = document.getElementById('awb').value;
-    const barcodeBase = awb.replace(/-/g, '').slice(0, -4); // Remove dash, then leave base
+    const baseBarcode = awb.replace(/-/g, ''); // Remove dash only
     const destination = document.getElementById('destination').value;
     const origin = document.getElementById('origin').value;
     const weight = document.getElementById('weight').value;
@@ -148,7 +158,7 @@
     let result = '';
 
     for (let i = start; i < start + count; i++) {
-      const uniqueBarcode = barcodeBase + String(i).padStart(4, '0');
+      const uniqueBarcode = baseBarcode + String(i).padStart(4, '0');
 
       result += `
 ^XA
