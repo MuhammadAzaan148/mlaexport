@@ -6,115 +6,140 @@
   <style>
     body {
       font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      margin: 0;
+      padding: 0;
+    }
+    #loginScreen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+    #loginScreen img {
+      width: 150px;
+      margin-bottom: 10px;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      margin: 6px 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      width: 250px;
+    }
+    button {
+      cursor: pointer;
+      background-color: #007bff;
+      color: white;
+    }
+    #mainApp {
+      display: none;
       max-width: 500px;
       margin: 40px auto;
       padding: 20px;
-      background: #f9f9f9;
+      background: #fff;
       border-radius: 12px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    h2 {
-      text-align: center;
     }
     label {
       font-weight: bold;
       margin-top: 10px;
       display: block;
     }
-    input {
-      width: 100%;
-      padding: 8px;
-      margin-top: 4px;
-      margin-bottom: 12px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-    }
-    button {
-      padding: 10px 20px;
-      background-color: #1e88e5;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 16px;
-    }
     textarea {
       width: 100%;
       height: 400px;
-      margin-top: 20px;
-      border-radius: 6px;
+      margin-top: 12px;
       padding: 10px;
       font-family: monospace;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    #copyBtn {
+      background-color: #4caf50;
     }
   </style>
 </head>
 <body>
-  <!-- 🔐 LOGIN SCREEN -->
-  <div id="loginScreen" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh;">
-    <h2>Enter Access Code</h2>
-    <input type="password" id="accessCode" placeholder="Enter code" style="padding:10px; font-size:16px; width: 200px; margin: 10px 0;">
-    <button onclick="checkAccess()">Unlock</button>
-    <p id="error" style="color: red;"></p>
-  </div>
 
-  <!-- 🔐 PROTECTED MAIN APP -->
-  <div id="mainApp" style="display:none;">
-    <h2>ZPL Label Generator</h2>
-    
-    <label>AWB No.</label>
-    <input type="text" id="awb" value="071-55976922">
+<div id="loginScreen">
+  <img src="https://media.giphy.com/media/l3q2K5jinAlChoCLS/giphy.gif" alt="Waving Boy">
+  <h2>Hey Azaan, is it you? Please confirm 😊</h2>
+  <input type="password" id="accessCode" placeholder="Enter access code">
+  <button onclick="checkAccess()">Unlock</button>
+  <p id="error" style="color:red;"></p>
+</div>
 
-    <label>Destination</label>
-    <input type="text" id="destination" value="TIP">
+<div id="mainApp">
+  <h2>ZPL Label Generator</h2>
 
-    <label>Origin</label>
-    <input type="text" id="origin" value="DXB">
+  <label>AWB No.</label>
+  <input type="text" id="awb" value="071-55976922" oninput="syncBarcode()">
 
-    <label>Weight</label>
-    <input type="text" id="weight" value="2120.0">
+  <label>Destination</label>
+  <input type="text" id="destination" value="TIP">
 
-    <label>No. of Pieces</label>
-    <input type="number" id="total" value="213">
+  <label>Origin</label>
+  <input type="text" id="origin" value="DXB">
 
-    <label>Start From Piece</label>
-    <input type="number" id="start" value="1">
+  <label>Weight</label>
+  <input type="text" id="weight" value="2120.0">
 
-    <label>Generate How Many</label>
-    <input type="number" id="count" value="10">
+  <label>No. of Pieces</label>
+  <input type="number" id="total" value="213">
 
-    <button onclick="generateZPL()">Generate ZPL</button>
+  <label>Start From Piece</label>
+  <input type="number" id="start" value="1">
 
-    <textarea id="output" readonly></textarea>
-  </div>
+  <label>Generate How Many</label>
+  <input type="number" id="count" value="10">
 
-  <script>
-    // 🔐 LOGIN VALIDATION
-    const secret = "azaan148";
-    function checkAccess() {
-      const code = document.getElementById("accessCode").value;
-      if (code === secret) {
-        document.getElementById("loginScreen").style.display = "none";
-        document.getElementById("mainApp").style.display = "block";
-      } else {
-        document.getElementById("error").textContent = "Incorrect code!";
-      }
+  <button onclick="generateZPL()">Generate ZPL</button>
+  <button id="copyBtn" onclick="copyZPL()">Copy ZPL</button>
+
+  <textarea id="output" readonly></textarea>
+
+  <!-- Hidden barcode field used internally -->
+  <input type="hidden" id="barcode">
+</div>
+
+<script>
+  const secret = "azaan148"; // Change this to your secret code
+
+  function checkAccess() {
+    const code = document.getElementById("accessCode").value;
+    if (code === secret) {
+      document.getElementById("loginScreen").style.display = "none";
+      document.getElementById("mainApp").style.display = "block";
+    } else {
+      document.getElementById("error").textContent = "Incorrect code!";
     }
+  }
 
-    // 🖨️ ZPL GENERATOR
-    function generateZPL() {
-      const awb = document.getElementById('awb').value.replace(/-/g, ''); // remove dash
-      const destination = document.getElementById('destination').value;
-      const origin = document.getElementById('origin').value;
-      const weight = document.getElementById('weight').value;
-      const total = parseInt(document.getElementById('total').value);
-      const start = parseInt(document.getElementById('start').value);
-      const count = parseInt(document.getElementById('count').value);
+  function syncBarcode() {
+    const awb = document.getElementById('awb').value;
+    const cleaned = awb.replace(/-/g, '');
+    document.getElementById('barcode').value = cleaned;
+  }
 
-      let result = '';
+  function generateZPL() {
+    const awb = document.getElementById('awb').value;
+    const barcodeBase = document.getElementById('barcode').value;
+    const destination = document.getElementById('destination').value;
+    const origin = document.getElementById('origin').value;
+    const weight = document.getElementById('weight').value;
+    const total = parseInt(document.getElementById('total').value);
+    const start = parseInt(document.getElementById('start').value);
+    const count = parseInt(document.getElementById('count').value);
 
-      for (let i = start; i < start + count; i++) {
-        const uniqueBarcode = awb + String(i).padStart(4, '0');
-        result += `
+    let result = '';
+
+    for (let i = start; i < start + count; i++) {
+      const pieceBarcode = barcodeBase + String(i).padStart(4, '0');
+      result += `
 ^XA
 ^PW800
 ^LL1270
@@ -123,7 +148,7 @@
 ^CF0,50
 ^FO200,95^FDETHIOPIAN AIRLINES S.C.^FS
 ^BY3,2,80
-^FO100,180^BC^FD${uniqueBarcode}^FS
+^FO100,180^BC^FD${pieceBarcode}^FS
 ^CF0,50
 ^FO70,310^FDAWB No.^FS
 ^CF0,70
@@ -153,12 +178,20 @@
 ^FO40,780^GB660,90,2^FS
 ^XZ
 `;
-      }
-
-      document.getElementById('output').value = result.trim();
     }
-  </script>
+
+    document.getElementById('output').value = result.trim();
+  }
+
+  function copyZPL() {
+    const output = document.getElementById('output');
+    output.select();
+    document.execCommand('copy');
+    alert('ZPL copied to clipboard!');
+  }
+
+  window.onload = syncBarcode;
+</script>
+
 </body>
 </html>
-
-
