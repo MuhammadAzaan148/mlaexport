@@ -90,9 +90,11 @@
       const start = parseInt(document.getElementById('start').value);
       const count = parseInt(document.getElementById('count').value);
 
+      const baseBarcode = barcode.slice(0, -4); // Remove last 4 digits
       let result = '';
 
       for (let i = start; i < start + count; i++) {
+        const uniqueBarcode = baseBarcode + String(i).padStart(4, '0');
         result += `
 ^XA
 ^PW800
@@ -102,7 +104,7 @@
 ^CF0,50
 ^FO200,95^FDETHIOPIAN AIRLINES S.C.^FS
 ^BY3,2,80
-^FO100,180^BC^FD${barcode}^FS
+^FO100,180^BC^FD${uniqueBarcode}^FS
 ^CF0,50
 ^FO70,310^FDAWB No.^FS
 ^CF0,70
@@ -139,3 +141,4 @@
   </script>
 </body>
 </html>
+
