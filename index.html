@@ -162,7 +162,7 @@
     let result = '';
 
     for (let i = start; i < start + count; i++) {
-      const uniqueBarcode = baseBarcode + String(i).padStart(4, '0');
+      const uniqueBarcode = baseBarcode + String(i).padStart(5, '0');
 
       result += `
 ^XA
